@@ -1,3 +1,4 @@
+import 'package:clear_pill_project/pages/drugscanner.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatelessWidget {
@@ -39,7 +40,7 @@ class Login extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => Drugscanner()));},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color.fromRGBO(19, 164, 236, 1), 
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
