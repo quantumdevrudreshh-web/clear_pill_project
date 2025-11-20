@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:clear_pill_project/pages/drugdetails.dart';
+import 'package:clear_pill_project/pages/settingspage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -38,7 +39,7 @@ class _DrugscannerState extends State<Drugscanner> {
         centerTitle: true,
         actions: <Widget>[
           IconButton(
-            onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => DrugDetails(bgColor: widget.bgColor,)));},
+            onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsPage(color: color, weight700: weight700, fontFamily: fontFamily)));},
             icon: Icon(Icons.settings, size: 24, color: Color.fromRGBO(19, 164, 236, 1),)
           )
         ],
@@ -201,11 +202,11 @@ class _DrugScannerBodyState extends State<DrugScannerBody> {
                   padding: EdgeInsets.all(8.0),
           
                   children: <Widget>[
-                    _buildImageCard('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&q=80', 'Common Medications'),
-                    _buildImageCard('https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400&q=80', 'Common Medications'),
-                    _buildImageCard('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&q=80', 'Common Medications'),
-                    _buildImageCard('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&q=80', 'Common Medications'),
-                    _buildImageCard('https://images.unsplash.com/photo-1501854140884-074bf6b243e7?w=400&q=80', 'Common Medications'),
+                    _buildImageCard('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&q=80', 'Common Medications', DrugDetails(bgColor: Color.fromRGBO(246, 247, 248, 1))),
+                    _buildImageCard('https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400&q=80', 'Common Medications', DrugDetails(bgColor: Color.fromRGBO(246, 247, 248, 1))),
+                    _buildImageCard('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&q=80', 'Common Medications', DrugDetails(bgColor: Color.fromRGBO(246, 247, 248, 1))),
+                    _buildImageCard('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&q=80', 'Common Medications', DrugDetails(bgColor: Color.fromRGBO(246, 247, 248, 1))),
+                    _buildImageCard('https://images.unsplash.com/photo-1501854140884-074bf6b243e7?w=400&q=80', 'Common Medications', DrugDetails(bgColor: Color.fromRGBO(246, 247, 248, 1))),
                   ],
                 ),
               )
@@ -217,15 +218,20 @@ class _DrugScannerBodyState extends State<DrugScannerBody> {
     );
   }
 
-  Widget _buildImageCard(String url, String caption) {
-    return Container(
-      margin: const EdgeInsets.only(right: 16.0), // Space between images
-      width: 250, // Fixed width for each item
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15.0),
-        image: DecorationImage(
-          image: NetworkImage(url),
-          fit: BoxFit.cover,
+  Widget _buildImageCard(String url, String , Widget widgetPage) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => widgetPage));
+      },
+      child: Container(
+        margin: const EdgeInsets.only(right: 16.0), // Space between images
+        width: 250, // Fixed width for each item
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15.0),
+          image: DecorationImage(
+            image: NetworkImage(url),
+            fit: BoxFit.cover,
+          ),
         ),
       ),
     );
