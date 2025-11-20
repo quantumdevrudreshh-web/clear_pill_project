@@ -34,12 +34,13 @@ class _DrugscannerState extends State<Drugscanner> {
     return Scaffold(
       backgroundColor: widget.bgColor,
       appBar: AppBar(
+        backgroundColor: widget.bgColor,
         leading: Icon(null),
         title: Text("Drug Scanner", style: TextStyle(color: color, fontFamily: fontFamily, fontWeight: weight700, fontSize: 20),),
         centerTitle: true,
         actions: <Widget>[
           IconButton(
-            onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsPage(color: color, weight700: weight700, fontFamily: fontFamily)));},
+            onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsPage(color: color, weight700: weight700, fontFamily: fontFamily, bgColor: widget.bgColor)));},
             icon: Icon(Icons.settings, size: 24, color: Color.fromRGBO(19, 164, 236, 1),)
           )
         ],
@@ -50,6 +51,8 @@ class _DrugscannerState extends State<Drugscanner> {
       bottomNavigationBar: BottomNavigationBar(
         // Important for more than 3 items:
         type: BottomNavigationBarType.fixed, 
+
+        backgroundColor: widget.bgColor,
         
         currentIndex: _currentIndex,
         onTap: (index) {

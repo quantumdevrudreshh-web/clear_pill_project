@@ -14,6 +14,7 @@ class DrugDetails extends StatelessWidget {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
+        backgroundColor: bgColor,
         title: Text("Drug Details", style: TextStyle(fontSize: 18, color: color, fontFamily: fontFamily, fontWeight: weight700, height: 1.75),),
         centerTitle: true,
       ),

@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 
 class SettingsPage extends StatelessWidget {
+  final Color bgColor;
   final Color color;
   final FontWeight weight700;
   final String fontFamily;
-  const SettingsPage({super.key, required this.color, required this.weight700, required this.fontFamily});
+  const SettingsPage({super.key, required this.color, required this.weight700, required this.fontFamily, required this.bgColor});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: bgColor,
       appBar: AppBar(
+        backgroundColor: bgColor,
         title: Text("Settings", style: TextStyle(fontWeight: weight700, fontSize: 20, height: 1.75, fontFamily: fontFamily),),
         centerTitle: true,
       ),
@@ -29,7 +32,7 @@ class SettingsBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color labelColor = Color.fromRGBO(0, 0, 0, 0.5);
     return Padding(
-      padding: const EdgeInsets.only(left: 16, right: 1, bottom: 96),
+      padding: const EdgeInsets.only(left: 16, right: 1, bottom: 32),
       child: ListView(
         children: <Widget> [
           Column(
