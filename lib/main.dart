@@ -11,10 +11,11 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+  Color bgColor = Color.fromRGBO(246, 247, 248, 1);
 
   @override
   Widget build(BuildContext context) {
-    return Login();
+    return Login(bgColor: bgColor,);
   }
 }

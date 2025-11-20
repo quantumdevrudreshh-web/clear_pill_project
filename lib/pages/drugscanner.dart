@@ -1,11 +1,12 @@
 import 'dart:io';
 
-import 'package:clear_pill_project/camera/camera.dart';
+import 'package:clear_pill_project/pages/drugdetails.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class Drugscanner extends StatefulWidget {
-  const Drugscanner({super.key});
+  final Color bgColor;
+  const Drugscanner({super.key, required this.bgColor});
 
   @override
   State<Drugscanner> createState() => _DrugscannerState();
@@ -30,13 +31,14 @@ class _DrugscannerState extends State<Drugscanner> {
   Widget build(BuildContext context) {
 
     return Scaffold(
+      backgroundColor: widget.bgColor,
       appBar: AppBar(
         leading: Icon(null),
         title: Text("Drug Scanner", style: TextStyle(color: color, fontFamily: fontFamily, fontWeight: weight700, fontSize: 20),),
         centerTitle: true,
         actions: <Widget>[
           IconButton(
-            onPressed: () {},
+            onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => DrugDetails(bgColor: widget.bgColor,)));},
             icon: Icon(Icons.settings, size: 24, color: Color.fromRGBO(19, 164, 236, 1),)
           )
         ],

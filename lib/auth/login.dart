@@ -2,7 +2,8 @@ import 'package:clear_pill_project/pages/drugscanner.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatelessWidget {
-  const Login({super.key});
+  final Color bgColor;
+  const Login({super.key, required this.bgColor});
 
   @override
   Widget build(BuildContext context) {
@@ -11,6 +12,7 @@ class Login extends StatelessWidget {
     String fontFamily = "Manrope";
     Color fgColor = Colors.white;
     return Scaffold(
+      backgroundColor: bgColor,
       body: Container(
         padding: EdgeInsetsDirectional.all(24),
         color: bgColor,
@@ -40,7 +42,7 @@ class Login extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => Drugscanner()));},
+                onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => Drugscanner(bgColor: bgColor,)));},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color.fromRGBO(19, 164, 236, 1), 
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
