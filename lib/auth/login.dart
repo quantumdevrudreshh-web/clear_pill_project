@@ -1,3 +1,5 @@
+import 'package:clear_pill_project/auth/login-page.dart';
+import 'package:clear_pill_project/auth/reg-page.dart';
 import 'package:clear_pill_project/pages/drugscanner.dart';
 import 'package:flutter/material.dart';
 
@@ -42,7 +44,7 @@ class Login extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => Drugscanner(bgColor: bgColor,)));},
+                onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) =>  LoginPage(bgColor: bgColor, fontFamily: fontFamily, weight700: weight700)));},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color.fromRGBO(19, 164, 236, 1), 
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -58,7 +60,7 @@ class Login extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterPage(bgColor: bgColor, fontFamily: fontFamily, weight700: weight700)));},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.lightBlue[100], 
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
