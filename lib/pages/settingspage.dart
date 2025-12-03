@@ -1,4 +1,6 @@
+import 'package:clear_pill_project/auth/login.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatelessWidget {
   final Color bgColor;
@@ -6,6 +8,23 @@ class SettingsPage extends StatelessWidget {
   final FontWeight weight700;
   final String fontFamily;
   const SettingsPage({super.key, required this.color, required this.weight700, required this.fontFamily, required this.bgColor});
+
+  void _logout(BuildContext context) async {
+    // 1. Get the instance
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // 2. Clear the specific key (or use prefs.clear() to remove everything)
+    await prefs.setBool('isLoggedIn', false);
+
+    // 3. Navigate back to Login and remove history
+    if (context.mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => Login(bgColor: bgColor)),
+        (route) => false,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +36,7 @@ class SettingsPage extends StatelessWidget {
         centerTitle: true,
       ),
 
-      body: SettingsBody(color: color, weight700: weight700, fontFamily: fontFamily),
+      body: SettingsBody(color: color, weight700: weight700, fontFamily: fontFamily, logout: () {_logout(context);},),
     );
   }
 }
@@ -26,7 +45,8 @@ class SettingsBody extends StatelessWidget {
   final Color color;
   final FontWeight weight700;
   final String fontFamily;
-  const SettingsBody({super.key, required this.color, required this.weight700, required this.fontFamily});
+  final VoidCallback logout;
+  const SettingsBody({super.key, required this.color, required this.weight700, required this.fontFamily, required this.logout});
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +64,8 @@ class SettingsBody extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 16, right: 1, bottom: 8, top: 8),
                 child: Text("ACCOUNT", style: TextStyle(color: labelColor, fontWeight: FontWeight.w600, fontFamily: fontFamily, fontSize: 14),),
               ),
-          
+
+              //Acount
               ListTile(
                 leading: SizedBox(
                   height: 48,
@@ -57,6 +78,7 @@ class SettingsBody extends StatelessWidget {
                 title: Text("Account Details", style: TextStyle(fontFamily: fontFamily, color: Color.fromRGBO(0, 0, 0, 1), fontWeight: FontWeight.w600),),
                 subtitle: Text("Manage your account details", style: TextStyle(fontFamily: fontFamily, color: Color.fromRGBO(0, 0, 0, 0.6), fontSize: 14, height: 1.25),),
                 trailing: Icon(Icons.arrow_forward_ios_outlined, color: Color.fromRGBO(0, 0, 0, 0.3),),
+                onTap: logout,
               ),
               const Divider(
                 color: Color.fromRGBO(0, 0, 0, 0.1), // Color of the line

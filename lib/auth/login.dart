@@ -1,6 +1,5 @@
 import 'package:clear_pill_project/auth/login-page.dart';
 import 'package:clear_pill_project/auth/reg-page.dart';
-import 'package:clear_pill_project/pages/drugscanner.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatelessWidget {
@@ -8,6 +7,7 @@ class Login extends StatelessWidget {
   const Login({super.key, required this.bgColor});
 
   @override
+  
   Widget build(BuildContext context) {
     Color bgColor = Color.fromRGBO(246, 247, 248, 1);
     FontWeight weight700 = FontWeight.w700;

@@ -1,24 +1,72 @@
+import 'package:clear_pill_project/auth/auth-service.dart';
 import 'package:clear_pill_project/auth/login-page.dart';
 import 'package:clear_pill_project/pages/drugscanner.dart';
 import 'package:flutter/material.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
   final Color bgColor;
   final String fontFamily;
   final FontWeight weight700;
   const RegisterPage({super.key, required this.bgColor, required this.fontFamily, required this.weight700});
 
   @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  final AuthService _authService = AuthService();
+
+  void _submit() async {
+    String userName = _usernameController.text;
+    String password = _passwordController.text;
+    String confirmPassword = _confirmPasswordController.text;
+
+    if(userName == "") {
+      _showMessage("Enter your UserName");
+      return;
+    } else if(password == "") {
+      _showMessage("Enter your password");
+      return;
+    } else if(password != confirmPassword) {
+      _showMessage("Passwords do not match");
+      return;
+    } else if(password.length < 8) {
+      _showMessage("Password length should be greater than 8");
+      return;
+    }
+
+    String result = await _authService.register(userName, password);
+
+    if(result == "Success") {
+      _showMessage("Registered Successfully! Please Login.");
+      setState(() {
+        // Switch to login screen
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage(bgColor: widget.bgColor, fontFamily: widget.fontFamily, weight700: widget.weight700)));
+      });
+    } else {
+      _showMessage("Register Failed: $result");
+    }
+  }
+
+  void _showMessage(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Register", style: TextStyle(fontWeight: weight700, fontFamily: fontFamily, fontSize: 18, height: 1.75),),
+        title: Text("Register", style: TextStyle(fontWeight: widget.weight700, fontFamily: widget.fontFamily, fontSize: 18, height: 1.75),),
         centerTitle: true,
       ),
 
       body: Container(
         padding: EdgeInsets.all(24),
-        child: LoginCredentials(fontFamily: fontFamily, weight700: weight700, bgColor: bgColor,),
+        child: LoginCredentials(fontFamily: widget.fontFamily, weight700: widget.weight700, bgColor: widget.bgColor, usernameController: _usernameController, passwordController: _passwordController, confirmPasswordController: _confirmPasswordController, submit: () {_submit();},),
       ),
     );
   }
@@ -28,7 +76,11 @@ class LoginCredentials extends StatelessWidget {
   final String fontFamily;
   final FontWeight weight700;
   final Color bgColor;
-  const LoginCredentials({super.key, required this.fontFamily, required this.weight700, required this.bgColor});
+  final TextEditingController usernameController;
+  final TextEditingController passwordController;
+  final TextEditingController confirmPasswordController;
+  final VoidCallback submit;
+  const LoginCredentials({super.key, required this.fontFamily, required this.weight700, required this.bgColor, required this.usernameController, required this.passwordController, required this.confirmPasswordController, required this.submit});
 
   @override
   Widget build(BuildContext context) {
@@ -37,13 +89,13 @@ class LoginCredentials extends StatelessWidget {
         Spacer(),
         CreateYourAccountText(fontFamily: fontFamily, weight700: weight700),
         SizedBox(height: 40,),
-        UserNameTextField(fontFamily: fontFamily,),
+        UserNameTextField(fontFamily: fontFamily, usernameController: usernameController,),
         SizedBox(height: 24,),
-        PasswordTextField(fontFamily: fontFamily),
+        PasswordTextField(fontFamily: fontFamily, passwordController: passwordController,),
         SizedBox(height: 24,),
-        ConfirmPasswordTextField(fontFamily: fontFamily),
+        ConfirmPasswordTextField(fontFamily: fontFamily, confirmPasswordController: confirmPasswordController,),
         SizedBox(height: 24,),
-        BottomSignUpButton(weight700: weight700, fontFamily: fontFamily, bgColor: bgColor,),
+        BottomSignUpButton(weight700: weight700, fontFamily: fontFamily, bgColor: bgColor, submit: () {submit();},),
         Spacer(),
         AlreadyHaveAccount(fontFamily: fontFamily, bgColor: bgColor,),
         SizedBox(height: 24,),
@@ -77,14 +129,16 @@ class CreateYourAccountText extends StatelessWidget {
 
 class UserNameTextField extends StatelessWidget {
   final String fontFamily;
-  const UserNameTextField({super.key, required this.fontFamily});
+  final TextEditingController usernameController;
+  const UserNameTextField({super.key, required this.fontFamily, required this.usernameController});
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: usernameController,
       decoration: InputDecoration(
         // 1. Labels and Hints
-        labelText: 'Username or Email',
+        labelText: 'Username',
         //hintText: 'Enter your unique username',
         //helperText: 'Must be at least 6 characters',
 
@@ -134,8 +188,9 @@ class UserNameTextField extends StatelessWidget {
 
 class PasswordTextField extends StatefulWidget {
   final String fontFamily;
+  final TextEditingController passwordController;
   
-  const PasswordTextField({super.key, required this.fontFamily});
+  const PasswordTextField({super.key, required this.fontFamily, required this.passwordController});
 
   @override
   State<PasswordTextField> createState() => _PasswordTextFieldState();
@@ -146,6 +201,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: widget.passwordController,
       obscureText: _isObscured,
       decoration: InputDecoration(
         // 1. Labels and Hints
@@ -211,8 +267,8 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
 
 class ConfirmPasswordTextField extends StatefulWidget {
   final String fontFamily;
-  
-  const ConfirmPasswordTextField({super.key, required this.fontFamily});
+  final TextEditingController confirmPasswordController;
+  const ConfirmPasswordTextField({super.key, required this.fontFamily, required this.confirmPasswordController});
 
   @override
   State<ConfirmPasswordTextField> createState() => _ConfirmPasswordTextFieldState();
@@ -223,6 +279,7 @@ class _ConfirmPasswordTextFieldState extends State<ConfirmPasswordTextField> {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: widget.confirmPasswordController,
       obscureText: _isObscured,
       decoration: InputDecoration(
         // 1. Labels and Hints
@@ -290,12 +347,13 @@ class BottomSignUpButton extends StatelessWidget {
   final FontWeight weight700;
   final String fontFamily;
   final Color bgColor;
-  const BottomSignUpButton({super.key, required this.weight700, required this.fontFamily, required this.bgColor});
+  final VoidCallback submit;
+  const BottomSignUpButton({super.key, required this.weight700, required this.fontFamily, required this.bgColor, required this.submit});
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-        onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => Drugscanner(bgColor: bgColor)));},
+        onPressed: () {submit();},
         style: ElevatedButton.styleFrom(
           backgroundColor: Color.fromRGBO(19, 164, 236, 1),
           minimumSize: Size(double.infinity, 50),

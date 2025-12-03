@@ -1,23 +1,67 @@
+import 'package:clear_pill_project/auth/auth-service.dart';
 import 'package:clear_pill_project/pages/drugscanner.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   final Color bgColor;
   final String fontFamily;
   final FontWeight weight700;
   const LoginPage({super.key, required this.bgColor, required this.fontFamily, required this.weight700});
 
   @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
+
+  void _submit() async {
+    String userName = _usernameController.text;
+    String password = _passwordController.text;
+
+    var result = await _authService.login(userName, password);
+
+    if(result['success']) {
+      // 1. Get the instance
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      
+      // 2. Save the value!
+      await prefs.setBool('isLoggedIn', true); 
+      // You can also save the User ID or Token here:
+      // await prefs.setString('userId', '12345');
+
+      // 3. Navigate to Home
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => Drugscanner(bgColor: widget.bgColor)),
+          (route) => false,
+        );
+      }
+    } else {
+      _showMessage("Login Failed: ${result['message']}");
+    }
+  }
+
+  void _showMessage(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Login", style: TextStyle(fontWeight: weight700, fontFamily: fontFamily, fontSize: 18, height: 1.75),),
+        title: Text("Login", style: TextStyle(fontWeight: widget.weight700, fontFamily: widget.fontFamily, fontSize: 18, height: 1.75),),
         centerTitle: true,
       ),
 
       body: Container(
         padding: EdgeInsets.all(24),
-        child: LoginCredentials(fontFamily: fontFamily, weight700: weight700, bgColor: bgColor,),
+        child: LoginCredentials(fontFamily: widget.fontFamily, weight700: widget.weight700, bgColor: widget.bgColor, usernameController: _usernameController, passwordController: _passwordController, submit: () { _submit(); },),
       ),
     );
   }
@@ -27,20 +71,23 @@ class LoginCredentials extends StatelessWidget {
   final String fontFamily;
   final FontWeight weight700;
   final Color bgColor;
-  const LoginCredentials({super.key, required this.fontFamily, required this.weight700, required this.bgColor});
+  final TextEditingController usernameController;
+  final TextEditingController passwordController;
+  final VoidCallback submit;
+  const LoginCredentials({super.key, required this.fontFamily, required this.weight700, required this.bgColor, required this.usernameController, required this.passwordController, required this.submit});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: <Widget> [
         Spacer(),
-        UserNameTextField(fontFamily: fontFamily,),
+        UserNameTextField(fontFamily: fontFamily, usernameController: usernameController,),
         SizedBox(height: 24,),
-        PasswordTextField(fontFamily: fontFamily),
+        PasswordTextField(fontFamily: fontFamily, passwordController: passwordController,),
         SizedBox(height: 24,),
         ForgotPassword(fontFamily: fontFamily),
         Spacer(),
-        BottomLoginButton(weight700: weight700, fontFamily: fontFamily, bgColor: bgColor,)
+        BottomLoginButton(weight700: weight700, fontFamily: fontFamily, bgColor: bgColor, submit: () { submit(); },)
       ],
     );
   }
@@ -48,11 +95,13 @@ class LoginCredentials extends StatelessWidget {
 
 class UserNameTextField extends StatelessWidget {
   final String fontFamily;
-  const UserNameTextField({super.key, required this.fontFamily});
+  final TextEditingController usernameController;
+  const UserNameTextField({super.key, required this.fontFamily, required this.usernameController});
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: usernameController,
       decoration: InputDecoration(
         // 1. Labels and Hints
         labelText: 'Username or Email',
@@ -105,8 +154,8 @@ class UserNameTextField extends StatelessWidget {
 
 class PasswordTextField extends StatefulWidget {
   final String fontFamily;
-  
-  const PasswordTextField({super.key, required this.fontFamily});
+  final TextEditingController passwordController;
+  const PasswordTextField({super.key, required this.fontFamily, required this.passwordController});
 
   @override
   State<PasswordTextField> createState() => _PasswordTextFieldState();
@@ -117,6 +166,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: widget.passwordController,
       obscureText: _isObscured,
       decoration: InputDecoration(
         // 1. Labels and Hints
@@ -184,12 +234,13 @@ class BottomLoginButton extends StatelessWidget {
   final FontWeight weight700;
   final String fontFamily;
   final Color bgColor;
-  const BottomLoginButton({super.key, required this.weight700, required this.fontFamily, required this.bgColor});
+  final VoidCallback submit;
+  const BottomLoginButton({super.key, required this.weight700, required this.fontFamily, required this.bgColor, required this.submit});
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-        onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => Drugscanner(bgColor: bgColor)));},
+        onPressed: () {submit();},
         style: ElevatedButton.styleFrom(
           backgroundColor: Color.fromRGBO(19, 164, 236, 1),
           minimumSize: Size(double.infinity, 50),
