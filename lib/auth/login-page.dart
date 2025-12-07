@@ -23,6 +23,8 @@ class _LoginPageState extends State<LoginPage> {
     String userName = _usernameController.text;
     String password = _passwordController.text;
 
+    print(_usernameController);
+
     var result = await _authService.login(userName, password);
 
     if(result['success']) {
@@ -104,7 +106,7 @@ class UserNameTextField extends StatelessWidget {
       controller: usernameController,
       decoration: InputDecoration(
         // 1. Labels and Hints
-        labelText: 'Username or Email',
+        labelText: 'Username',
         //hintText: 'Enter your unique username',
         //helperText: 'Must be at least 6 characters',
 
