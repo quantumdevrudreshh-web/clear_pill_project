@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 class AuthService {
 
   // Use 10.0.2.2 for Android Emulator, localhost for iOS
-  final String baseUrl = "http://192.168.0.104:8080/api/auth";
+  final String baseUrl = "http://10.71.112.13:8080/api/auth";
 
   //RegisterFunction
   Future<String> register(String userName, String password) async {

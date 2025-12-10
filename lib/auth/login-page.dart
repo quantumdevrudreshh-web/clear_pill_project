@@ -56,7 +56,9 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: widget.bgColor,
       appBar: AppBar(
+        backgroundColor: widget.bgColor,
         title: Text("Login", style: TextStyle(fontWeight: widget.weight700, fontFamily: widget.fontFamily, fontSize: 18, height: 1.75),),
         centerTitle: true,
       ),
@@ -241,17 +243,20 @@ class BottomLoginButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-        onPressed: () {submit();},
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Color.fromRGBO(19, 164, 236, 1),
-          minimumSize: Size(double.infinity, 50),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16)
-          )
+    return Container(
+      color: bgColor,
+      child: ElevatedButton(
+          onPressed: () {submit();},
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color.fromRGBO(19, 164, 236, 1),
+            minimumSize: Size(double.infinity, 50),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16)
+            )
+          ),
+          child: Text("Login", style: TextStyle(fontWeight: weight700, fontFamily: fontFamily, height: 3.5, color: Colors.white),),
         ),
-        child: Text("Login", style: TextStyle(fontWeight: weight700, fontFamily: fontFamily, height: 3.5, color: Colors.white),),
-      );
+    );
   }
 }
 
