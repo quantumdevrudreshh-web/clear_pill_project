@@ -1,5 +1,10 @@
+import 'dart:ffi';
+
+import 'package:clear_pill_project/pages/ReminderTime.dart';
+import 'package:clear_pill_project/reminder/reminder-service.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Medicationschedule extends StatefulWidget {
   final Color color;
@@ -28,6 +33,34 @@ class _MedicationscheduleState extends State<Medicationschedule> {
         child: Text(items, style: TextStyle(color: subHeadColor, height: 1.5, fontWeight: FontWeight.w400, fontSize: 16),),
       );
     }).toList();
+  }
+
+  // ***BACKEND SPRINGBOOT ***
+  final ReminderService _api = ReminderService();
+  List<Reminder> _reminders = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData(); // Load data from DB when app starts
+  }
+
+  // Fetch data from Spring Boot
+  void _fetchData() async {
+    try {
+      // Getting UserId from Login Page i.e Shared Preferences.
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? userId = prefs.getString('userId');
+      var data = await _api.getReminders(userId);
+      setState(() {
+        _reminders = data;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print(e);
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -180,48 +213,77 @@ class _MedicationscheduleState extends State<Medicationschedule> {
             SizedBox(height: 16,),
             Text("What time(s) should we remind you?", style: TextStyle(fontFamily: widget.fontFamily, color: subHeadColor, fontSize: 14, height: 1.25, fontWeight: FontWeight.w500),),
             SizedBox(height: 12,),
-            Container(
-              height: 100,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: <Widget> [
-                    // To add the Alarm function.z
-                    DottedBorder(
-                      color: Color.fromRGBO(74, 144, 226, 0.4), // Color of the dots
-                      strokeWidth: 2, // Thickness of the dots
-                      dashPattern: const [6, 3], // 6px Line, 3px Space
-                      borderType: BorderType.RRect, // Rounded Rectangle
-                      radius: const Radius.circular(12), // Corner Radius
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: TextButton(
-                          onPressed: () {
-                            print("Dotted Button Pressed!");
-                          },
-                          style: TextButton.styleFrom(
-                            backgroundColor: Color.fromRGBO(74, 144, 226, 0.1),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.add, fontWeight: FontWeight.normal, size: 24, color: Color.fromRGBO(74, 144, 226, 1),),
-                              Text(
-                                'Add Reminder Time',
-                                style: TextStyle(fontSize: 14, height: 1.25, color: Color.fromRGBO(74, 144, 226, 1), fontFamily: widget.fontFamily, fontWeight: FontWeight.w600,),
+            Expanded(
+              child: Stack (
+                children: <Widget> [
+                  _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _reminders.isEmpty
+                      ? const Center(child: Text("No reminders found in DB"))
+                      : ListView.builder(
+                          itemCount: _reminders.length,
+                          itemBuilder: (context, index) {
+                            final item = _reminders[index];
+                            return Card(
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  child: Text("${index + 1}", style: TextStyle(fontFamily: widget.fontFamily),),
+                                ),
+                                title: Text(item.reminderTime,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold, fontFamily: widget.fontFamily)),
+                                subtitle: Text(item.foodInstruction, style: TextStyle(fontFamily: widget.fontFamily),),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  onPressed: () async {
+                                    // Delete from DB
+                                    await _api.deleteReminder(item.id!);
+                                    _fetchData(); // Refresh list
+                                  },
+                                ),
                               ),
-                            ],
-                          ),
+                            );
+                          },
                         ),
-                      ),
+                ],
+              ),
+            ),
+
+            // To add the Alarm function.
+            DottedBorder(
+              color: Color.fromRGBO(74, 144, 226, 0.4), // Color of the dots
+              strokeWidth: 2, // Thickness of the dots
+              dashPattern: const [6, 3], // 6px Line, 3px Space
+              borderType: BorderType.RRect, // Rounded Rectangle
+              radius: const Radius.circular(12), // Corner Radius
+              child: SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => ReminderTime(fontFamily: widget.fontFamily, weight700: widget.weight700, bgColor: widget.bgColor)));
+                  },
+                  style: TextButton.styleFrom(
+                    backgroundColor: Color.fromRGBO(74, 144, 226, 0.1),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add, fontWeight: FontWeight.normal, size: 24, color: Color.fromRGBO(74, 144, 226, 1),),
+                      Text(
+                        'Add Reminder Time',
+                        style: TextStyle(fontSize: 14, height: 1.25, color: Color.fromRGBO(74, 144, 226, 1), fontFamily: widget.fontFamily, fontWeight: FontWeight.w600,),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

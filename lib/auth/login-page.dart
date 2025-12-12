@@ -36,6 +36,9 @@ class _LoginPageState extends State<LoginPage> {
       // You can also save the User ID or Token here:
       // await prefs.setString('userId', '12345');
 
+      var serverResponse = result['data'];
+      await prefs.setString('userId', serverResponse['User id'].toString());
+
       // 3. Navigate to Home
       if (mounted) {
         Navigator.pushAndRemoveUntil(
