@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:clear_pill_project/pages/MedicationHomepage.dart';
 import 'package:clear_pill_project/pages/MedicationSchedule.dart';
 import 'package:clear_pill_project/pages/drugdetails.dart';
 import 'package:clear_pill_project/pages/settingspage.dart';
@@ -26,7 +27,7 @@ class _DrugscannerState extends State<Drugscanner> {
     DrugScannerBody(color: color, weight700: weight700, fontFamily: fontFamily, bgColor: widget.bgColor,),
     const Center(child: Text('History Page', style: TextStyle(fontSize: 24))),
     Medicationschedule(color: color, weight700: weight700, fontFamily: "ManropeBold", bgColor: widget.bgColor,),
-    const Center(child: Text('Profile Page', style: TextStyle(fontSize: 24))),
+    MedicationHomepage(fontFamily: fontFamily, weight700: weight700, bgColor: widget.bgColor)
   ];
 
   @override
