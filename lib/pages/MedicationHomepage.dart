@@ -1,5 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:intl/intl.dart';
+
+class Task {
+  final String title;
+  final String instructionTitle;
+  final TimeOfDay time;
+  bool isDone;
+
+  Task({required this.title, required this.time, this.isDone = false, required this.instructionTitle});
+}
 
 class MedicationHomepage extends StatefulWidget {
   final String fontFamily;
@@ -15,9 +25,36 @@ class _MedicationHomepageState extends State<MedicationHomepage> {
   Color headingColor = Color.fromRGBO(13, 23, 27, 1);
   Color bgColorAfterOnTap = Color.fromRGBO(74, 144, 226, 0.2);
   Color buttonFontColor = Color.fromRGBO(74, 144, 226, 1);
+  Color subContentColor = Color.fromRGBO(142, 142, 147, 1);
+
+  // 1. Define your Tasks
+  // Using a simple Map structure: {'title': String, 'isDone': bool}
+  final List<Task> _tasks = [
+    Task(title: "Lunch", time: const TimeOfDay(hour: 13, minute: 0), instructionTitle: 'Take After Food', isDone: false), // 1:00 PM
+    Task(title: "Project Work", time: const TimeOfDay(hour: 14, minute: 30), instructionTitle: 'Take Before Food', isDone: false), // 2:30 PM
+    Task(title: "Gym", time: const TimeOfDay(hour: 17, minute: 0), instructionTitle: 'Any time', isDone: false), // 5:00 PM
+    Task(title: "Walk Dog", time: const TimeOfDay(hour: 18, minute: 30), instructionTitle: 'With Food', isDone: false), // 6:30 PM
+    Task(title: "Dinner", time: const TimeOfDay(hour: 20, minute: 0), instructionTitle: 'Take After Food', isDone: false), // 8:00 PM
+    Task(title: "Read Book", time: const TimeOfDay(hour: 22, minute: 0), instructionTitle: 'Take Before Food', isDone: false), // 10:00 PM
+    Task(title: "Team Meeting", time: const TimeOfDay(hour: 10, minute: 0), instructionTitle: 'Take Before Food', isDone: false),
+    Task(title: "Wake Up", time: const TimeOfDay(hour: 6, minute: 30), instructionTitle: 'Take Before Food', isDone: false),
+  ];
+
+  // 2. Helper to calculate progress (0.0 to 1.0)
+  int get _progress {
+    if (_tasks.isEmpty) return 0;
+    int completedCount = _tasks.where((t) => t.isDone == true).length;
+    return completedCount;
+  }
   
   @override
   Widget build(BuildContext context) {
+
+    // Calculate percentage string (e.g., "40%")
+    String completed = "${(_progress).toInt()}";
+
+    String indicator = "$completed of ${_tasks.length} doses taken";
+
     return Scaffold(
       backgroundColor: widget.bgColor,
       drawer: Drawer(),
@@ -32,10 +69,47 @@ class _MedicationHomepageState extends State<MedicationHomepage> {
       ),
 
       body: Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 112),
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
         child: Column(
           children: <Widget> [
-            HorizontalDateScroller(bgColorAfterOnTap: bgColorAfterOnTap, fontFamily: widget.fontFamily, subColor: headingColor, buttonFontColor: buttonFontColor,)
+            HorizontalDateScroller(bgColorAfterOnTap: bgColorAfterOnTap, fontFamily: widget.fontFamily, subColor: headingColor, buttonFontColor: buttonFontColor,),
+            SizedBox(height: 16,),
+            // --- THE PROGRESS BAR SECTION ---
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Today's Progress",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: headingColor, height: 1.5, fontFamily: widget.fontFamily),
+                ),
+                Text(
+                  indicator,
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: subContentColor,
+                      fontFamily: widget.fontFamily,
+                      height: 1.5
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            
+            // The Progress Bar Widget
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10), // Rounded corners
+              child: LinearProgressIndicator(
+                value: _progress / 5, // Current value (0.0 to 1.0)
+                minHeight: 10, // Thickness
+                backgroundColor: Colors.grey[300], // Background color
+                valueColor: const AlwaysStoppedAnimation<Color>(Colors.blueAccent), // Fill color
+                // Optional: Add animation value color if needed
+              ),
+            ),
+
+            const SizedBox(height: 16),
+            CategorizedTasksPage(headingColor: headingColor, buttonFontColor: buttonFontColor, subContentColor: subContentColor, fontFamily: widget.fontFamily, allTasks: _tasks,)
           ],
         ),
       ),
@@ -196,6 +270,171 @@ class _DateButtonCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class CategorizedTasksPage extends StatefulWidget {
+  final Color headingColor;
+  final Color buttonFontColor;
+  final Color subContentColor;
+  final String fontFamily;
+  final List<Task> allTasks;
+  
+  const CategorizedTasksPage({super.key, required this.headingColor, required this.buttonFontColor, required this.subContentColor, required this.fontFamily, required this.allTasks});
+
+  @override
+  State<CategorizedTasksPage> createState() => _CategorizedTasksPageState();
+}
+
+class _CategorizedTasksPageState extends State<CategorizedTasksPage> {
+
+  // 3. Helper to determine category
+  String _getCategory(TimeOfDay time) {
+    // Convert to total minutes for easy comparison
+    // hour * 60 + minute
+    int totalMinutes = time.hour * 60 + time.minute;
+
+    // Ranges (in minutes):
+    // 6:00 AM (360) to 11:59 AM (719)
+    if (totalMinutes >= 360 && totalMinutes <= 719) {
+      return "Morning Intake";
+    }
+    // 12:00 PM (720) to 3:59 PM (959)
+    else if (totalMinutes >= 720 && totalMinutes <= 959) {
+      return "Afternoon Intake";
+    }
+    // 4:00 PM (960) to 6:50 PM (1130)
+    else if (totalMinutes >= 960 && totalMinutes <= 1130) {
+      return "Evening Intake";
+    }
+    // 7:00 PM (1140) to 11:00 PM (1380)
+    else if (totalMinutes >= 1140 && totalMinutes <= 1380) {
+      return "Late Night Intake";
+    } 
+    else {
+      return "Other / Early Morning";
+    }
+  }
+
+  // 4. Group the tasks into a Map
+  Map<String, List<Task>> get _groupedTasks {
+    Map<String, List<Task>> groups = {
+      "Morning Intake": [],
+      "Afternoon Intake": [],
+      "Evening Intake": [],
+      "Late Night Intake": [],
+      "Other / Early Morning": []
+    };
+
+    for (var task in widget.allTasks) {
+      String category = _getCategory(task.time);
+      print(category);
+      // Only add if the category exists in our map (filters out super early/late stuff if needed)
+      if (groups.containsKey(category)) {
+        groups[category]!.add(task);
+      } else {
+        // Handle "Other" if necessary
+        groups.putIfAbsent(category, () => []).add(task);
+      }
+    }
+    return groups;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    // Sort the list in place
+    widget.allTasks.sort((a, b) {
+      // Convert time to "minutes from midnight"
+      int minutesA = a.time.hour * 60 + a.time.minute;
+      int minutesB = b.time.hour * 60 + b.time.minute;
+      
+      // Compare them (Ascending order: 6 AM -> 10 PM)
+      return minutesA.compareTo(minutesB);
+    });
+
+    final groupedTasks = _groupedTasks;
+    // Get keys that actually have tasks, to avoid showing empty headers
+    final activeCategories = groupedTasks.keys
+        .where((key) => groupedTasks[key]!.isNotEmpty)
+        .toList();
+
+    return Expanded(
+      child: ListView.builder(
+          itemCount: activeCategories.length,
+          itemBuilder: (context, index) {
+            String category = activeCategories[index];
+            List<Task> tasksInSection = groupedTasks[category]!;
+      
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // --- SECTION HEADER ---
+                Text(
+                  category,
+                  style: TextStyle(
+                    fontSize: 18, 
+                    fontWeight: FontWeight.bold, 
+                    fontFamily: widget.fontFamily,
+                    color: widget.headingColor
+                  ),
+                ),
+      
+                // --- TASKS IN THIS SECTION ---
+                ...tasksInSection.map((task) {
+                  bool isTaken = task.isDone;
+                  return ListTile(
+                    leading: Text(
+                      task.time.format(context), // Displays 6:30 AM
+                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18, fontFamily: widget.fontFamily),
+                    ),
+                    title: Text(task.title, style: TextStyle(fontFamily: widget.fontFamily, color: widget.headingColor, fontWeight: FontWeight.w500),),
+                    subtitle: Text(task.instructionTitle, style: TextStyle(fontFamily: widget.fontFamily, color: widget.subContentColor, fontWeight: FontWeight.w500, height: 1.5),),
+                    trailing: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          task.isDone = !task.isDone; // Toggle logic                        
+                        });
+                        // Call API to update status here if needed
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                        decoration: BoxDecoration(
+                          // Change Color based on status
+                          color: isTaken ? null : Color.fromRGBO(74, 144, 226, 0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isTaken ? Icons.check_circle : Icons.medication_outlined,
+                              color: isTaken ? Colors.green : widget.buttonFontColor,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              isTaken ? "TAKEN" : "TAKE",
+                              style: TextStyle(
+                                color: isTaken ? Colors.green : widget.buttonFontColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                fontFamily: widget.fontFamily,
+                                height: 1.25
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ],
+            );
+          },
+        ),
     );
   }
 }
