@@ -2,7 +2,7 @@ name: clear_pill_project
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -30,19 +30,17 @@ environment:
 dependencies:
   http: ^1.2.0
 
-  shared_preferences: ^2.5.3
-
   dotted_border: ^2.1.0
 
   intl: ^0.20.2
 
   flutter:
     sdk: flutter
-  
-  image_picker: ^1.1.2
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  shared_preferences: ^2.5.4
+  image_picker: ^1.2.1
 
 dev_dependencies:
   flutter_test:
@@ -60,20 +58,19 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
 
   fonts:
-      - family: Manrope
-        fonts:
-          - asset: assets/fonts/Manrope-Regular.ttf
-          - asset: assets/fonts/Manrope-Light.ttf   
+    - family: Manrope
+      fonts:
+        - asset: assets/fonts/Manrope-Regular.ttf
+        - asset: assets/fonts/Manrope-Light.ttf
 
-      - family: ManropeBold
-        fonts:
+    - family: ManropeBold
+      fonts:
         - asset: assets/fonts/Manrope-Bold.ttf
   # To add assets to your application, add an assets section, like this:
   # assets:

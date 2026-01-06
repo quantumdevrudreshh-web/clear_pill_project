@@ -1,7 +1,5 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 // Data Model
 class Reminder {
@@ -24,7 +22,7 @@ class Reminder {
 // API Helper
 class ReminderService {
   // Use 10.0.2.2 for Emulator, localhost for iOS, or your PC IP for Real Device
-  final String baseUrl = "http://192.168.0.104:8080/api/reminders"; 
+  final String baseUrl = "http://192.168.0.107:8080/api/reminders"; 
 
   Future<List<Reminder>> getReminders(String? userId) async {
 
@@ -38,7 +36,8 @@ class ReminderService {
   }
 
   Future<void> addReminder(String? userId, String time, String instruction) async {
-  
+    print(userId);
+    print("----------------------------");
     await http.post(
       Uri.parse('$baseUrl/add/user/$userId'),
       headers: {"Content-Type": "application/json"},

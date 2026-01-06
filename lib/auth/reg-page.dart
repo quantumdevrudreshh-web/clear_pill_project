@@ -1,6 +1,5 @@
 import 'package:clear_pill_project/auth/auth-service.dart';
 import 'package:clear_pill_project/auth/login-page.dart';
-import 'package:clear_pill_project/pages/drugscanner.dart';
 import 'package:flutter/material.dart';
 
 class RegisterPage extends StatefulWidget {

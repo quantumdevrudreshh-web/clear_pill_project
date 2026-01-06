@@ -37,8 +37,9 @@ class _LoginPageState extends State<LoginPage> {
       // await prefs.setString('userId', '12345');
 
       var serverResponse = result['data'];
-      await prefs.setString('userId', serverResponse['User id'].toString());
-
+      await prefs.setString('userId', serverResponse['id'].toString());
+      print(serverResponse['id'].toString());
+      print("THis iiiiiiiiiiiiiiiiiiii");
       // 3. Navigate to Home
       if (mounted) {
         Navigator.pushAndRemoveUntil(
@@ -50,6 +51,7 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       _showMessage("Login Failed: ${result['message']}");
     }
+    
   }
 
   void _showMessage(String msg) {
